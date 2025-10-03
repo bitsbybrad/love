@@ -1,0 +1,7 @@
+{
+  "Lua.runtime.version": "LuaJIT",
+  "Lua.diagnostics.globals": ["love"],
+  "Lua.format.enable": false,
+  "editor.formatOnSave": true,
+  "[lua]": { "editor.defaultFormatter": "JohnnyMorganz.stylua" }
+}

@@ -1,0 +1,7 @@
+return {
+  default = {
+    pattern = "_spec",       -- matches *_spec.lua
+    recursive = true,
+    path = { "spec", "packages" }, -- look in these dirs
+  }
+}

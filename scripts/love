@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ $# -lt 1 ]; then
+  echo "Usage: scripts/love-run <app_dir> [--watch]"
+  exit 1
+fi
+
+APP_DIR="$1"
+WATCH="${2:-}"
+
+# Resolve love binary
+LOVE_BIN="${LOVE_BIN:-$(command -v love || true)}"
+if [ -z "$LOVE_BIN" ]; then
+  # macOS fallback to .app
+  if [ -x "/Applications/love.app/Contents/MacOS/love" ]; then
+    LOVE_BIN="/Applications/love.app/Contents/MacOS/love"
+  else
+    echo "Could not find 'love'. Install it or set LOVE_BIN=/path/to/love"
+    exit 1
+  fi
+fi
+
+run_once() {
+  "$LOVE_BIN" "$APP_DIR"
+}
+
+if [ "$WATCH" = "--watch" ]; then
+  if command -v watchexec >/dev/null 2>&1; then
+    watchexec -w "$APP_DIR" -w packages -r -- bash -lc "stylua . && luacheck . && run_once"
+  elif command -v entr >/dev/null 2>&1; then
+    find "$APP_DIR" packages -type f -name '*.lua' | entr -r bash -lc "stylua . && luacheck . && run_once"
+  else
+    echo "Install 'watchexec' or 'entr' for watch mode, falling back to single run."
+    run_once
+  fi
+else
+  run_once
+fi
